@@ -1,32 +1,35 @@
-import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import React from "react";
+import {
+  NativeBaseProvider,
+  Text,
+  Box,
+  Center,
+  View,
+  Fab,
+  Icon,
+} from "native-base";
 
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import { AntDesign } from "@expo/vector-icons";
 
-export default function TabTwoScreen() {
+const TabTwoScreen = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
-    </View>
+    <NativeBaseProvider>
+      <Center flex={1}>
+        <Text>Tab 2</Text>
+        <Box position="relative" h={100} w="100%">
+          <Fab
+            position="absolute"
+            size="lg"
+            bg="#2563eb"
+            onPress={() => navigation.navigate("CreateProperty")}
+            icon={
+              <Icon color="white" as={<AntDesign name="plus" />} size="sm" />
+            }
+          />
+        </Box>
+      </Center>
+    </NativeBaseProvider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default TabTwoScreen;
