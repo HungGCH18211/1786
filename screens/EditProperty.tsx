@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   NativeBaseProvider,
   Text,
@@ -30,7 +30,7 @@ import moment from "moment";
 import db from "./TabTwoScreen";
 import * as SQLite from "expo-sqlite";
 
-const CreateProperty = ({ navigation }) => {
+const EditProperty = ({ navigation, route }) => {
   const db = SQLite.openDatabase("dbProperty");
   const [fields, setFields] = useState({
     type: "",
@@ -51,6 +51,19 @@ const CreateProperty = ({ navigation }) => {
   const onChangeText = (inputField, text) => {
     setFields((prev) => ({ ...prev, ...{ [inputField]: text } }));
   };
+
+  useEffect(() => {
+    setFurniture(route.params.type);
+    setFields({
+      type: route.params.property,
+      bedrooms: route.params.bed,
+      money: route.params.price,
+      notes: route.params.note,
+      reporter: route.params.reporter,
+    });
+    setDate(route.params.date);
+  }, []);
+
   const checkField = () => {
     if (!fields.type.trim()) {
       setTypeNull(true);
@@ -104,7 +117,7 @@ const CreateProperty = ({ navigation }) => {
     showMode("date");
   };
 
-  const createProperty = async () => {
+  const editProperty = async () => {
     await checkField();
     if (
       !fields.type.trim() ||
@@ -115,7 +128,26 @@ const CreateProperty = ({ navigation }) => {
       checkField();
       Alert.alert("Notice", "Please insert all of the required fields!");
     } else {
-      insertData();
+      db.transaction((tx) => {
+        tx.executeSql(
+          `UPDATE Property_Table set property_type=?, bedrooms=?, date=?, price=?, furniture_type=?, notes=?, reporter=? where property_id=${route.params.id}`,
+          [
+            fields.type,
+            fields.bedrooms,
+            JSON.parse(JSON.stringify(date)),
+            fields.money,
+            furniture,
+            fields.notes,
+            fields.reporter,
+          ],
+          (tx, results) => {
+            navigation.navigate("Home");
+            if (results.rowsAffected > 0) {
+              Alert.alert("Success", "Update property successfully!");
+            } else Alert.alert("Error");
+          }
+        );
+      });
     }
   };
 
@@ -127,16 +159,17 @@ const CreateProperty = ({ navigation }) => {
         [
           fields.type,
           fields.bedrooms,
-          JSON.parse(JSON.stringify(date)),
+          date.toString(),
           fields.money,
           furniture,
           fields.notes,
           fields.reporter,
         ],
         (tx, results) => {
+          console.log("Results", results);
           if (results.rowsAffected > 0) {
             navigation.navigate("Home");
-            Alert.alert("Success", "Create property successfully!");
+            Alert.alert("Success", "Data Inserted Successfully!");
           } else Alert.alert("Failed", "Failed to create property!");
         }
       );
@@ -328,14 +361,14 @@ const CreateProperty = ({ navigation }) => {
             <Icon as={Ionicons} name="cloud-upload-outline" size="sm" />
           }
           onPress={() => {
-            createProperty();
+            editProperty();
           }}
         >
-          Create property
+          Update property
         </Button>
       </Center>
     </NativeBaseProvider>
   );
 };
 
-export default CreateProperty;
+export default EditProperty;
