@@ -14,11 +14,12 @@ import {
   HStack,
   Image,
   Input,
+  Modal,
+  Button,
 } from "native-base";
 import { FlatList, Alert, LogBox } from "react-native";
-import { AntDesign, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
-import navigation from "../navigation";
 
 const TabTwoScreen = ({ navigation }) => {
   const db = SQLite.openDatabase("dbProperty");
@@ -27,22 +28,28 @@ const TabTwoScreen = ({ navigation }) => {
   const [searchResult, setSearchResult] = useState([]);
   const [showAll, setShowAll] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [idModal, setIdModal] = useState("");
 
   const handleChange = () => {
-    setSearchResult(
-      property.filter((obj) => {
-        return (
-          obj.property_type === searchValue ||
-          obj.reporter === searchValue ||
-          obj.property_id === Number(searchValue) ||
-          obj.price === searchValue
-        );
-      })
-    );
-    Logic();
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM Property_Table where property_type like '${searchValue}%' `,
+        [],
+        (tx, results) => {
+          const arr = [];
+          for (let i = 0; i < results.rows.length; ++i)
+            arr.push(results.rows.item(i));
+          console.log("Search Value:", arr);
+          setSearchResult(arr);
+        }
+      );
+    });
+    logic();
   };
 
-  const Logic = () => {
+  const logic = () => {
     if (!searchValue || searchResult.length === 0) {
       setShowSearch(false);
       setShowAll(true);
@@ -52,17 +59,35 @@ const TabTwoScreen = ({ navigation }) => {
     }
   };
 
+  const addMore = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE Property_Table set more=? where property_id=${idModal}`,
+        [notes.trim()],
+        (tx, results) => {
+          setShowModal(false);
+          if (results.rowsAffected > 0) {
+            setNotes(null);
+            setIdModal(null);
+            readData();
+            Alert.alert("Success", "Add a note successfully!");
+          } else Alert.alert("Error");
+        }
+      );
+    });
+  };
+
   useEffect(() => {
     readData();
     handleChange();
-    // Logic();
+    logic();
     LogBox.ignoreLogs([
       "The contrast ratio of 1:1 for darkText on transparent",
     ]);
   }, []);
 
   const readData = () => {
-    Logic();
+    logic();
     setShowAll(true);
     db.transaction((tx) => {
       tx.executeSql("SELECT * FROM Property_Table", [], (tx, results) => {
@@ -83,13 +108,8 @@ const TabTwoScreen = ({ navigation }) => {
         (tx, results) => {
           console.log("Results", results.rowsAffected);
           if (results.rowsAffected > 0) {
-            Alert.alert("Done", "Delete property successfully!"),
-              [
-                {
-                  text: "Ok",
-                  onPress: () => readData(),
-                },
-              ];
+            readData();
+            Alert.alert("Done", "Delete property successfully!");
           }
         }
       );
@@ -122,15 +142,34 @@ const TabTwoScreen = ({ navigation }) => {
     <Pressable onPress={() => {}}>
       <Stack mb={5} mx={2} rounded={15} bg="#fff" shadow={2}>
         <VStack p={3}>
-          <Image
-            source={{
-              uri: "https://d2e5ushqwiltxm.cloudfront.net/wp-content/uploads/sites/92/2019/11/20071929/0919-AJS-NOI-Hotel-des-Arts-SGN-1091-Web-1500x690.jpg",
-            }}
-            alt="Alternate Text"
-            width={400}
-            height={250}
-            rounded={15}
-          />
+          <View>
+            <Image
+              source={{
+                uri: "https://d2e5ushqwiltxm.cloudfront.net/wp-content/uploads/sites/92/2019/11/20071929/0919-AJS-NOI-Hotel-des-Arts-SGN-1091-Web-1500x690.jpg",
+              }}
+              alt="Alternate Text"
+              width={400}
+              height={250}
+              rounded={15}
+            />
+            <View
+              position="absolute"
+              bg="#facc15"
+              right="0"
+              p={2}
+              borderBottomLeftRadius={15}
+              borderTopRightRadius={15}
+            >
+              <Pressable
+                onPress={() => {
+                  setShowModal(true);
+                  setIdModal(item.property_id);
+                }}
+              >
+                <SimpleLineIcons name="note" size={24} color="white" />
+              </Pressable>
+            </View>
+          </View>
           <Text color="#2563eb" fontSize={16}>
             # {item.property_id}
           </Text>
@@ -144,7 +183,7 @@ const TabTwoScreen = ({ navigation }) => {
             <AntDesign name="star" size={20} color="#facc15" />
             <AntDesign name="star" size={20} color="#facc15" />
             <Text color="#737b8b" ml={2}>
-              (34 reviews)
+              (29 reviews)
             </Text>
           </HStack>
 
@@ -167,10 +206,10 @@ const TabTwoScreen = ({ navigation }) => {
           <Text color="#737b8b" mb={1}>
             Created at: {item.date.substring(0, 10)}{" "}
           </Text>
-          <HStack alignItems="center" mb={1}>
+          <HStack alignItems="center" mb={2}>
             <MaterialIcons name="notes" size={18} color="#2563eb" />
             {item.notes === "" ? (
-              <Text color="#737b8b" mb={1} ml={1}>
+              <Text color="#737b8b" ml={1}>
                 Notes: <Text color="#2563eb">None</Text>
               </Text>
             ) : (
@@ -179,12 +218,21 @@ const TabTwoScreen = ({ navigation }) => {
               </Text>
             )}
           </HStack>
-          <HStack alignItems="center" mb={1}>
+          <HStack alignItems="center" mb={2}>
             <AntDesign name="user" size={18} color="#2563eb" />
             <Text color="#737b8b" ml={1}>
               Reporter: {item.reporter}
             </Text>
           </HStack>
+          {item.more === "" || item.more === null ? null : (
+            <HStack alignItems="center" mb={2}>
+              <SimpleLineIcons name="note" size={18} color="#2563eb" />
+
+              <Text color="#737b8b" ml={1}>
+                More: {item.more}
+              </Text>
+            </HStack>
+          )}
 
           <Heading color="#2563eb">${item.price}.00</Heading>
           <HStack alignItems="center" my={2}>
@@ -236,9 +284,9 @@ const TabTwoScreen = ({ navigation }) => {
   };
   return (
     <NativeBaseProvider>
-      <View flex={1} mt={20}>
+      <View flex={1} mt={20} bg="#f2f2f2">
         <Center>
-          <Heading mb={3} size="xl">
+          <Heading mb={3} size="xl" color="#2563eb">
             RentalZ
           </Heading>
           <Stack mx={2} mb={2}>
@@ -286,6 +334,46 @@ const TabTwoScreen = ({ navigation }) => {
             />
           </View>
         )}
+
+        <Modal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false);
+            setNotes(null);
+            setIdModal(null);
+          }}
+        >
+          <Modal.Content maxWidth="400px">
+            <Modal.CloseButton />
+            <Modal.Header>Add more information about the property</Modal.Header>
+            <Modal.Body>
+              <Input
+                InputLeftElement={
+                  <Icon as={<SimpleLineIcons name="note" />} size={7} mx={2} />
+                }
+                borderColor="#ccc"
+                mb={3}
+                p={3}
+                size="lg"
+                borderRadius={15}
+                value={notes}
+                onChangeText={(text) => setNotes(text)}
+                placeholder="More"
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  onPress={() => {
+                    addMore();
+                  }}
+                >
+                  Save
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal>
 
         <Box position="absolute" h={100} w="100%">
           <Fab

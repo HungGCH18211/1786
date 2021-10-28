@@ -151,30 +151,6 @@ const EditProperty = ({ navigation, route }) => {
     }
   };
 
-  // insert to database
-  const insertData = () => {
-    db.transaction(function (tx) {
-      tx.executeSql(
-        "INSERT INTO Property_Table (property_type, bedrooms, date, price, furniture_type, notes, reporter) VALUES (?,?,?,?,?,?,?)",
-        [
-          fields.type,
-          fields.bedrooms,
-          date.toString(),
-          fields.money,
-          furniture,
-          fields.notes,
-          fields.reporter,
-        ],
-        (tx, results) => {
-          console.log("Results", results);
-          if (results.rowsAffected > 0) {
-            navigation.navigate("Home");
-            Alert.alert("Success", "Data Inserted Successfully!");
-          } else Alert.alert("Failed", "Failed to create property!");
-        }
-      );
-    });
-  };
   return (
     <NativeBaseProvider>
       <Pressable

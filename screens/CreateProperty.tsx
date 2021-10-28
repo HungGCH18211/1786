@@ -27,7 +27,6 @@ import {
 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
-import db from "./TabTwoScreen";
 import * as SQLite from "expo-sqlite";
 
 const CreateProperty = ({ navigation }) => {
