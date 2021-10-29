@@ -21,7 +21,7 @@ import { FlatList, Alert, LogBox } from "react-native";
 import { AntDesign, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
 
-const TabTwoScreen = ({ navigation }) => {
+const ViewAll = ({ navigation }) => {
   const db = SQLite.openDatabase("dbProperty");
   const [property, setProperty] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -116,6 +116,28 @@ const TabTwoScreen = ({ navigation }) => {
     });
   };
 
+  const viewProperty = (
+    id,
+    property,
+    bed,
+    date,
+    type,
+    note,
+    price,
+    reporter
+  ) => {
+    navigation.navigate("ViewProperty", {
+      id: id,
+      property: property,
+      date: date,
+      type: type,
+      bed: bed,
+      price: price,
+      reporter: reporter,
+      note: note,
+    });
+  };
+
   const editProperty = (
     id,
     property,
@@ -139,7 +161,20 @@ const TabTwoScreen = ({ navigation }) => {
   };
 
   const Item = ({ item }) => (
-    <Pressable onPress={() => {}}>
+    <Pressable
+      onPress={() => {
+        viewProperty(
+          item.property_id,
+          item.property_type,
+          item.bedrooms,
+          item.date,
+          item.furniture_type,
+          item.notes,
+          item.price,
+          item.reporter
+        );
+      }}
+    >
       <Stack mb={5} mx={2} rounded={15} bg="#fff" shadow={2}>
         <VStack p={3}>
           <View>
@@ -289,6 +324,7 @@ const TabTwoScreen = ({ navigation }) => {
           <Heading mb={3} size="xl" color="#2563eb">
             RentalZ
           </Heading>
+
           <Stack mx={2} mb={2}>
             <Input
               value={searchValue}
@@ -389,7 +425,7 @@ const TabTwoScreen = ({ navigation }) => {
         <Box position="absolute" h={100} w="100%">
           <Fab
             position="absolute"
-            right={100}
+            right={85}
             size="lg"
             bg="#eab308"
             onPress={() => readData()}
@@ -403,4 +439,4 @@ const TabTwoScreen = ({ navigation }) => {
   );
 };
 
-export default TabTwoScreen;
+export default ViewAll;

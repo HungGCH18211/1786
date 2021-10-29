@@ -2,18 +2,16 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
 import CreateProperty from "../screens/CreateProperty";
-import TabOneScreen from "../screens/TabOneScreen";
-import TabTwoScreen from "../screens/TabTwoScreen";
 import EditProperty from "../screens/EditProperty";
+import ViewAll from "../screens/ViewAll";
+import ViewOne from "../screens/ViewOne";
 
 export default () => {
   return <Navigator />;
 };
 
 const Stack = createStackNavigator();
-
 function RootNavigator() {
   return (
     <Stack.Navigator>
@@ -25,6 +23,19 @@ function RootNavigator() {
       <Stack.Screen
         name="CreateProperty"
         component={CreateProperty}
+        options={({ navigation }) => ({
+          title: "",
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#f9fafd",
+            shadowColor: "#f9fafd",
+            elevation: 0,
+          },
+        })}
+      />
+      <Stack.Screen
+        name="ViewProperty"
+        component={ViewOne}
         options={({ navigation }) => ({
           title: "",
           headerShown: false,
@@ -56,7 +67,7 @@ const BottomTab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
   return (
     <BottomTab.Navigator
-      initialRouteName="TabTwo"
+      initialRouteName="home"
       screenOptions={{
         tabBarActiveTintColor: "#2563eb",
         tabBarInactiveTintColor: "#A5A7AC",
@@ -64,8 +75,8 @@ const BottomTabNavigator = () => {
       }}
     >
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="home"
+        component={ViewAll}
         options={{
           title: "Property",
           tabBarIcon: ({ color }) => (

@@ -12,7 +12,6 @@ export default function App() {
         [],
         function (tx, res) {
           if (res.rows.length == 0) {
-            // txn.executeSql("DROP TABLE IF EXISTS Property_Table", []);
             txn.executeSql(
               "CREATE TABLE IF NOT EXISTS Property_Table(property_id INTEGER PRIMARY KEY AUTOINCREMENT, property_type VARCHAR(255) NOT NULL, bedrooms VARCHAR(255) NOT NULL, date TEXT NOT NULL, price VARCHAR(255) NOT NULL, furniture_type VARCHAR(255) NULL, notes VARCHAR(255) NULL, reporter VARCHAR(255) NOT NULL, more VARCHAR(255) NULL)",
               []

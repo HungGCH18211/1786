@@ -53,28 +53,24 @@ const CreateProperty = ({ navigation }) => {
   const checkField = () => {
     if (!fields.type.trim()) {
       setTypeNull(true);
-      return;
     } else {
       setTypeNull(false);
     }
 
     if (!fields.bedrooms.trim()) {
       setRoomsNull(true);
-      return;
     } else {
       setRoomsNull(false);
     }
 
     if (!fields.money.trim()) {
       setPriceNull(true);
-      return;
     } else {
       setPriceNull(false);
     }
 
     if (!fields.reporter.trim()) {
       setReporterNull(true);
-      return;
     } else {
       setReporterNull(false);
     }

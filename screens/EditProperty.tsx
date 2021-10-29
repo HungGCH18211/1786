@@ -27,7 +27,7 @@ import {
 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
-import db from "./TabTwoScreen";
+import db from "./ViewAll";
 import * as SQLite from "expo-sqlite";
 
 const EditProperty = ({ navigation, route }) => {
@@ -67,28 +67,24 @@ const EditProperty = ({ navigation, route }) => {
   const checkField = () => {
     if (!fields.type.trim()) {
       setTypeNull(true);
-      return;
     } else {
       setTypeNull(false);
     }
 
     if (!fields.bedrooms.trim()) {
       setRoomsNull(true);
-      return;
     } else {
       setRoomsNull(false);
     }
 
     if (!fields.money.trim()) {
       setPriceNull(true);
-      return;
     } else {
       setPriceNull(false);
     }
 
     if (!fields.reporter.trim()) {
       setReporterNull(true);
-      return;
     } else {
       setReporterNull(false);
     }
@@ -165,7 +161,7 @@ const EditProperty = ({ navigation, route }) => {
 
       <Center mx={2} flex={1}>
         <Heading mb={3} size="xl">
-          Create property
+          Edit property
         </Heading>
         <Input
           InputLeftElement={
