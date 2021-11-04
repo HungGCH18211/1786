@@ -2,31 +2,18 @@ import React, { useState } from "react";
 import {
   NativeBaseProvider,
   Text,
-  Box,
-  Center,
   View,
   Pressable,
-  Heading,
-  Input,
-  Icon,
-  Button,
   HStack,
-  Select,
-  CheckIcon,
   Image,
   Avatar,
   VStack,
   ScrollView,
 } from "native-base";
-import { LogBox } from "react-native";
-import { Platform } from "react-native";
-import { Alert } from "react-native";
 import {
   FontAwesome,
   AntDesign,
-  MaterialIcons,
   MaterialCommunityIcons,
-  SimpleLineIcons,
   Ionicons,
 } from "@expo/vector-icons";
 

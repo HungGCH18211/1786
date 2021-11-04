@@ -31,6 +31,77 @@ const ViewAll = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [notes, setNotes] = useState("");
   const [idModal, setIdModal] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    readData();
+    handleChange();
+    logic();
+    LogBox.ignoreLogs([
+      "The contrast ratio of 1:1 for darkText on transparent",
+    ]);
+  }, []);
+
+  const readData = () => {
+    logic();
+    setShowAll(true);
+    db.transaction((tx) => {
+      tx.executeSql("SELECT * FROM Property_Table", [], (tx, results) => {
+        const arr = [];
+        for (let i = 0; i < results.rows.length; ++i)
+          arr.push(results.rows.item(i));
+        setProperty(
+          arr.sort(function (a, b) {
+            return b.property_id - a.property_id;
+          })
+        );
+      });
+    });
+  };
+
+  const deleteProperty = (id) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM Property_Table where property_id=?",
+        [id],
+        (tx, results) => {
+          console.log("Results", results.rowsAffected);
+          if (results.rowsAffected > 0) {
+            readData();
+            Alert.alert("Done", `Delete property id=${id} successfully!`);
+          }
+        }
+      );
+    });
+  };
+
+  const addMore = () => {
+    setLoading(true);
+    if (!notes.trim()) {
+      Alert.alert(
+        "Notice",
+        "You must enter somethings to do this action. Or else, close the modal"
+      );
+      setLoading(false);
+    } else {
+      db.transaction((tx) => {
+        tx.executeSql(
+          `UPDATE Property_Table set more=? where property_id=${idModal}`,
+          [notes.trim()],
+          (tx, results) => {
+            setShowModal(false);
+            if (results.rowsAffected > 0) {
+              setNotes(null);
+              setIdModal(null);
+              setLoading(false);
+              readData();
+              Alert.alert("Success", "Add a note successfully!");
+            } else Alert.alert("Error");
+          }
+        );
+      });
+    }
+  };
 
   const handleChange = () => {
     db.transaction((tx) => {
@@ -57,63 +128,6 @@ const ViewAll = ({ navigation }) => {
       setShowSearch(true);
       setShowAll(false);
     }
-  };
-
-  const addMore = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `UPDATE Property_Table set more=? where property_id=${idModal}`,
-        [notes.trim()],
-        (tx, results) => {
-          setShowModal(false);
-          if (results.rowsAffected > 0) {
-            setNotes(null);
-            setIdModal(null);
-            readData();
-            Alert.alert("Success", "Add a note successfully!");
-          } else Alert.alert("Error");
-        }
-      );
-    });
-  };
-
-  useEffect(() => {
-    readData();
-    handleChange();
-    logic();
-    LogBox.ignoreLogs([
-      "The contrast ratio of 1:1 for darkText on transparent",
-    ]);
-  }, []);
-
-  const readData = () => {
-    logic();
-    setShowAll(true);
-    db.transaction((tx) => {
-      tx.executeSql("SELECT * FROM Property_Table", [], (tx, results) => {
-        var arr = [];
-        for (let i = 0; i < results.rows.length; ++i)
-          arr.push(results.rows.item(i));
-        console.log("Array:", arr);
-        setProperty(arr);
-      });
-    });
-  };
-
-  const deleteProperty = (id) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "DELETE FROM Property_Table where property_id=?",
-        [id],
-        (tx, results) => {
-          console.log("Results", results.rowsAffected);
-          if (results.rowsAffected > 0) {
-            readData();
-            Alert.alert("Done", "Delete property successfully!");
-          }
-        }
-      );
-    });
   };
 
   const viewProperty = (
@@ -319,7 +333,7 @@ const ViewAll = ({ navigation }) => {
   };
   return (
     <NativeBaseProvider>
-      <View flex={1} mt={20} bg="#f2f2f2">
+      <View flex={1} mt={10} bg="#f2f2f2">
         <Center>
           <Heading mb={3} size="xl" color="#2563eb">
             RentalZ
@@ -399,13 +413,19 @@ const ViewAll = ({ navigation }) => {
             </Modal.Body>
             <Modal.Footer>
               <Button.Group space={2}>
-                <Button
-                  onPress={() => {
-                    addMore();
-                  }}
-                >
-                  Save
-                </Button>
+                {loading ? (
+                  <Button isLoading isLoadingText="Submitting">
+                    Add
+                  </Button>
+                ) : (
+                  <Button
+                    onPress={() => {
+                      addMore();
+                    }}
+                  >
+                    Add
+                  </Button>
+                )}
               </Button.Group>
             </Modal.Footer>
           </Modal.Content>

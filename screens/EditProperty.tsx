@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   NativeBaseProvider,
   Text,
-  Box,
   Center,
   View,
   Pressable,
@@ -14,7 +13,6 @@ import {
   Select,
   CheckIcon,
 } from "native-base";
-import { LogBox } from "react-native";
 import { Platform } from "react-native";
 import { Alert } from "react-native";
 import {
@@ -27,8 +25,8 @@ import {
 } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
-import db from "./ViewAll";
 import * as SQLite from "expo-sqlite";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const EditProperty = ({ navigation, route }) => {
   const db = SQLite.openDatabase("dbProperty");
@@ -61,7 +59,7 @@ const EditProperty = ({ navigation, route }) => {
       notes: route.params.note,
       reporter: route.params.reporter,
     });
-    setDate(route.params.date);
+    // setDate(route.params.date);
   }, []);
 
   const checkField = () => {
@@ -102,7 +100,6 @@ const EditProperty = ({ navigation, route }) => {
   const onChange = (event, selectedDate) => {
     setShow(Platform.OS === "ios");
     setDate(selectedDate);
-    checkField();
     console.log("Date: ", selectedDate);
   };
   const showMode = (currentMode) => {
@@ -130,7 +127,7 @@ const EditProperty = ({ navigation, route }) => {
           [
             fields.type,
             fields.bedrooms,
-            JSON.parse(JSON.stringify(date)),
+            route.params.date || JSON.parse(JSON.stringify(date)),
             fields.money,
             furniture,
             fields.notes,
@@ -175,7 +172,6 @@ const EditProperty = ({ navigation, route }) => {
           value={fields.type}
           onChangeText={(type) => onChangeText("type", type)}
           placeholder="Property Type"
-          onSubmitEditing={() => checkField()}
         />
         {typeNull && onError()}
         <Input
@@ -195,7 +191,6 @@ const EditProperty = ({ navigation, route }) => {
           onChangeText={(bedrooms) => onChangeText("bedrooms", bedrooms)}
           placeholder="Bedrooms"
           keyboardType="numeric"
-          onSubmitEditing={() => checkField()}
         />
         {roomsNull && onError()}
         {/* Select date */}
@@ -212,22 +207,18 @@ const EditProperty = ({ navigation, route }) => {
             as={<FontAwesome name="calendar" color="black" />}
             size={7}
             mx={2}
-            mr={20}
           />
-          <Button
-            bg="#2563eb"
-            _text={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: 18,
-            }}
-            onPress={() => showDatepicker()}
-          >
-            Select date
-          </Button>
-          <Text m={3.5} fontSize={"lg"}>
-            {moment(date).format("YYYY-MM-DD")}
-          </Text>
+          <TouchableOpacity onPress={() => showDatepicker()}>
+            {date ? (
+              <Text fontSize={16} p={3}>
+                {date.toString().slice(0, 25)}
+              </Text>
+            ) : (
+              <Text fontSize={16} p={3}>
+                {route.params.date}
+              </Text>
+            )}
+          </TouchableOpacity>
         </HStack>
         {show && (
           <DateTimePicker
@@ -252,7 +243,6 @@ const EditProperty = ({ navigation, route }) => {
           onChangeText={(money) => onChangeText("money", money)}
           placeholder="Price"
           keyboardType="numeric"
-          onSubmitEditing={() => checkField()}
         />
         {priceNull && onError()}
         <HStack
@@ -285,7 +275,6 @@ const EditProperty = ({ navigation, route }) => {
             mt={1}
             onValueChange={(itemValue) => {
               setFurniture(itemValue);
-              checkField();
             }}
           >
             <Select.Item label="Furnished" value="Furnished" />
@@ -305,7 +294,6 @@ const EditProperty = ({ navigation, route }) => {
           value={fields.notes}
           onChangeText={(notes) => onChangeText("notes", notes)}
           placeholder="Notes (optional)"
-          onSubmitEditing={() => checkField()}
         />
         <Input
           InputLeftElement={
@@ -319,7 +307,6 @@ const EditProperty = ({ navigation, route }) => {
           value={fields.reporter}
           onChangeText={(reporter) => onChangeText("reporter", reporter)}
           placeholder="Reporter name"
-          onSubmitEditing={() => checkField()}
         />
         {reporterNull && onError()}
         <Button

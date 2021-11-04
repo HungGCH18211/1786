@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   NativeBaseProvider,
   Text,
-  Box,
   Center,
   View,
   Pressable,
@@ -14,7 +13,6 @@ import {
   Select,
   CheckIcon,
 } from "native-base";
-import { LogBox } from "react-native";
 import { Platform } from "react-native";
 import { Alert } from "react-native";
 import {
@@ -28,6 +26,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import * as SQLite from "expo-sqlite";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const CreateProperty = ({ navigation }) => {
   const db = SQLite.openDatabase("dbProperty");
@@ -88,7 +87,6 @@ const CreateProperty = ({ navigation }) => {
   const onChange = (event, selectedDate) => {
     setShow(Platform.OS === "ios");
     setDate(selectedDate);
-    checkField();
     console.log("Date: ", selectedDate);
   };
   const showMode = (currentMode) => {
@@ -165,7 +163,6 @@ const CreateProperty = ({ navigation }) => {
           value={fields.type}
           onChangeText={(type) => onChangeText("type", type)}
           placeholder="Property Type"
-          onSubmitEditing={() => checkField()}
         />
         {typeNull && onError()}
         <Input
@@ -185,16 +182,15 @@ const CreateProperty = ({ navigation }) => {
           onChangeText={(bedrooms) => onChangeText("bedrooms", bedrooms)}
           placeholder="Bedrooms"
           keyboardType="numeric"
-          onSubmitEditing={() => checkField()}
         />
         {roomsNull && onError()}
         {/* Select date */}
+
         <HStack
           mb={3}
           width="100%"
           borderWidth={1}
           borderColor="#ccc"
-          flexDirection="row"
           rounded={15}
           alignItems="center"
         >
@@ -202,23 +198,14 @@ const CreateProperty = ({ navigation }) => {
             as={<FontAwesome name="calendar" color="black" />}
             size={7}
             mx={2}
-            mr={20}
           />
-          <Button
-            bg="#2563eb"
-            _text={{
-              color: "white",
-              fontWeight: "bold",
-              fontSize: 18,
-            }}
-            onPress={() => showDatepicker()}
-          >
-            Select date
-          </Button>
-          <Text m={3.5} fontSize={"lg"}>
-            {moment(date).format("YYYY-MM-DD")}
-          </Text>
+          <TouchableOpacity onPress={() => showDatepicker()}>
+            <Text fontSize={16} p={3}>
+              {date.toString().slice(0, 25)}
+            </Text>
+          </TouchableOpacity>
         </HStack>
+
         {show && (
           <DateTimePicker
             testID="dateTimePicker"
@@ -242,7 +229,6 @@ const CreateProperty = ({ navigation }) => {
           onChangeText={(money) => onChangeText("money", money)}
           placeholder="Price"
           keyboardType="numeric"
-          onSubmitEditing={() => checkField()}
         />
         {priceNull && onError()}
         <HStack
@@ -275,7 +261,6 @@ const CreateProperty = ({ navigation }) => {
             mt={1}
             onValueChange={(itemValue) => {
               setFurniture(itemValue);
-              checkField();
             }}
           >
             <Select.Item label="Furnished" value="Furnished" />
@@ -295,7 +280,6 @@ const CreateProperty = ({ navigation }) => {
           value={fields.notes}
           onChangeText={(notes) => onChangeText("notes", notes)}
           placeholder="Notes (optional)"
-          onSubmitEditing={() => checkField()}
         />
         <Input
           InputLeftElement={
@@ -309,7 +293,6 @@ const CreateProperty = ({ navigation }) => {
           value={fields.reporter}
           onChangeText={(reporter) => onChangeText("reporter", reporter)}
           placeholder="Reporter name"
-          onSubmitEditing={() => checkField()}
         />
         {reporterNull && onError()}
         <Button
