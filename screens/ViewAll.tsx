@@ -333,9 +333,9 @@ const ViewAll = ({ navigation }) => {
   };
   return (
     <NativeBaseProvider>
-      <View flex={1} mt={10} bg="#f2f2f2">
+      <View flex={1} bg="#f2f2f2">
         <Center>
-          <Heading mb={3} size="xl" color="#2563eb">
+          <Heading my={3} size="xl" color="#2563eb">
             RentalZ
           </Heading>
 

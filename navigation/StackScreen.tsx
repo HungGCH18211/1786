@@ -1,11 +1,10 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CreateProperty from "../screens/CreateProperty";
 import EditProperty from "../screens/EditProperty";
 import ViewAll from "../screens/ViewAll";
 import ViewOne from "../screens/ViewOne";
+import LandingPage from "../screens/LandingPage";
 
 export default () => {
   return <Navigator />;
@@ -14,10 +13,15 @@ export default () => {
 const Stack = createStackNavigator();
 function RootNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="landing">
       <Stack.Screen
         name="Home"
-        component={BottomTabNavigator}
+        component={ViewAll}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="landing"
+        component={LandingPage}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -63,31 +67,6 @@ function RootNavigator() {
   );
 }
 
-const BottomTab = createBottomTabNavigator();
-const BottomTabNavigator = () => {
-  return (
-    <BottomTab.Navigator
-      initialRouteName="home"
-      screenOptions={{
-        tabBarActiveTintColor: "#2563eb",
-        tabBarInactiveTintColor: "#A5A7AC",
-        headerShown: false,
-      }}
-    >
-      <BottomTab.Screen
-        name="home"
-        component={ViewAll}
-        options={{
-          title: "Property",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={28} />
-          ),
-        }}
-      />
-    </BottomTab.Navigator>
-  );
-};
-
 const Navigator = () => {
   return (
     <Stack.Navigator>
@@ -95,11 +74,6 @@ const Navigator = () => {
         options={{ headerShown: false }}
         name="Auth"
         component={RootNavigator}
-      />
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="Tab"
-        component={BottomTabNavigator}
       />
     </Stack.Navigator>
   );

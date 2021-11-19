@@ -5,6 +5,7 @@ import * as SQLite from "expo-sqlite";
 
 export default function App() {
   const db = SQLite.openDatabase("dbProperty");
+  // create db
   useEffect(() => {
     db.transaction(function (txn) {
       txn.executeSql(

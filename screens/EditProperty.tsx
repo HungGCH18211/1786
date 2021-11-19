@@ -151,7 +151,7 @@ const EditProperty = ({ navigation, route }) => {
           navigation.navigate("Home");
         }}
       >
-        <View mt={12} mx={2}>
+        <View mt={2} mx={2}>
           <AntDesign name="back" size={30} color="black" />
         </View>
       </Pressable>

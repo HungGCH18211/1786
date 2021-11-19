@@ -28,7 +28,6 @@ const ViewOne = ({ navigation, route }) => {
           alt="Alternate Text"
           width={400}
           height={300}
-          rounded={15}
           borderBottomRadius={30}
         />
         <View position="absolute">
@@ -37,7 +36,7 @@ const ViewOne = ({ navigation, route }) => {
               navigation.navigate("Home");
             }}
           >
-            <View mt={8} mx={2}>
+            <View mt={4} mx={2}>
               <AntDesign name="back" size={30} color="black" />
             </View>
           </Pressable>

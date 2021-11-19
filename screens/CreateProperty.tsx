@@ -142,7 +142,7 @@ const CreateProperty = ({ navigation }) => {
           navigation.navigate("Home");
         }}
       >
-        <View mt={12} mx={2}>
+        <View mt={2} mx={2}>
           <AntDesign name="back" size={30} color="black" />
         </View>
       </Pressable>
@@ -185,7 +185,6 @@ const CreateProperty = ({ navigation }) => {
         />
         {roomsNull && onError()}
         {/* Select date */}
-
         <HStack
           mb={3}
           width="100%"
