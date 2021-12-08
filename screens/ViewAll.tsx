@@ -45,6 +45,8 @@ const ViewAll = ({ navigation }) => {
   const readData = () => {
     logic();
     setShowAll(true);
+    setShowSearch(false);
+    setSearchValue("");
     db.transaction((tx) => {
       tx.executeSql("SELECT * FROM Property_Table", [], (tx, results) => {
         const arr = [];
@@ -77,7 +79,7 @@ const ViewAll = ({ navigation }) => {
 
   const addMore = () => {
     setLoading(true);
-    if (!notes.trim()) {
+    if (!notes.trim() || !notes) {
       Alert.alert(
         "Notice",
         "You must enter somethings to do this action. Or else, close the modal"
@@ -91,12 +93,15 @@ const ViewAll = ({ navigation }) => {
           (tx, results) => {
             setShowModal(false);
             if (results.rowsAffected > 0) {
-              setNotes(null);
-              setIdModal(null);
+              setNotes("");
+              setIdModal("");
               setLoading(false);
               readData();
               Alert.alert("Success", "Add a note successfully!");
-            } else Alert.alert("Error");
+            } else {
+              Alert.alert("Error");
+              setLoading(false);
+            }
           }
         );
       });
@@ -414,11 +419,12 @@ const ViewAll = ({ navigation }) => {
             <Modal.Footer>
               <Button.Group space={2}>
                 {loading ? (
-                  <Button isLoading isLoadingText="Submitting">
+                  <Button isLoading isLoadingText="Submitting" color="blue.500">
                     Add
                   </Button>
                 ) : (
                   <Button
+                    color="blue.500"
                     onPress={() => {
                       addMore();
                     }}
